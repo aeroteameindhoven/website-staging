@@ -5,6 +5,12 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Aero Team Eindhoven Staging</title>
+        <style>
+            :root {
+                /* Prefer dark theme */
+                color-scheme: dark light;
+            }
+        </style>
         <script>
             /** @returns {Promise<["normal", null] | ["closed", string] | ["open", string]>} */
             async function dynamic404() {
@@ -80,12 +86,6 @@
                 });
             });
         </script>
-        <style>
-            :root {
-                /* Prefer dark theme */
-                color-scheme: dark light;
-            }
-        </style>
     </head>
     <body>
         <div id="normal_404_page" hidden>
