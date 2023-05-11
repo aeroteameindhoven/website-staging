@@ -5,9 +5,92 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Aero Team Eindhoven Staging</title>
+        <script>
+            /** @returns {Promise<["normal" | "closed" | "open", string]>} */
+            async function dynamic404() {
+                const path = document.location.pathname;
+
+                const regex = /^\/preview\/pr-(?<pr>\d+)\/(?<path>.*)$/;
+
+                const matches = regex.exec(path);
+
+                if (matches == null) {
+                    // Normal 404 page
+                    return ["normal", ""];
+                }
+
+                const path_fragment = matches.groups["path"];
+                const pr_number = matches.groups["pr"];
+
+                if (
+                    path_fragment.length === 0 ||
+                    path_fragment === "404.html"
+                ) {
+                    // Root of deleted pr or 404 page of deleted PR
+                    return [
+                        "closed",
+                        `https://github.com/aeroteameindhoven/website/pull/${pr_number}`,
+                    ];
+                } else {
+                    // 404 page of possibly existing pr
+                    const response = await fetch(
+                        `/preview/pr-${pr_number}/404.html`
+                    );
+
+                    const body = await response.text();
+
+                    return ["open", body];
+                    document.body.innerHTML = body;
+                }
+            }
+
+            const promise = dynamic404();
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const normal_404_page = /** @type {HTMLDivElement} */ (
+                    document.getElementById("normal_404_page")
+                );
+                const closed_pr_page = /** @type {HTMLDivElement} */ (
+                    document.getElementById("closed_pr_page")
+                );
+                const closed_pr_link = /** @type {HTMLAnchorElement} */ (
+                    document.getElementById("closed_pr_link")
+                );
+
+                promise.then(([page_type, page_data]) => {
+                    switch (page_type) {
+                        case "normal": {
+                            normal_404_page.hidden = false;
+                            closed_pr_page.hidden = true;
+
+                            break;
+                        }
+                        case "closed": {
+                            normal_404_page.hidden = true;
+                            closed_pr_page.hidden = false;
+                            closed_pr_link.href = page_data;
+
+                            break;
+                        }
+                        case "open": {
+                            document.body.innerHTML = page_data;
+
+                            break;
+                        }
+                    }
+                });
+            });
+        </script>
     </head>
     <body>
-        <div id="normal_404_page">
+        <style>
+            /* Style definition placed in body as to be removed when body is replaced */
+            :root {
+                /* Prefer dark theme */
+                color-scheme: dark light;
+            }
+        </style>
+        <div id="normal_404_page" hidden>
             <p>There exists no content here</p>
             <nav>
                 <li><a href="/">return to the root</a></li>
@@ -20,8 +103,8 @@
         </div>
         <div id="closed_pr_page" hidden>
             <p>
-                This pull request was closed or the pull request is missing a
-                404 page. You can see the pull request
+                This pull request is not open, or is missing a 404 page. You can
+                see the pull request
                 <a id="closed_pr_link">on github</a>
             </p>
             <p>
@@ -30,49 +113,4 @@
             </p>
         </div>
     </body>
-    <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            const normal_404_page = /** @type {HTMLDivElement} */ (
-                document.getElementById("normal_404_page")
-            );
-            const closed_pr_page = /** @type {HTMLDivElement} */ (
-                document.getElementById("closed_pr_page")
-            );
-            const closed_pr_link = /** @type {HTMLAnchorElement} */ (
-                document.getElementById("closed_pr_link")
-            );
-
-            const path = document.location.pathname;
-
-            const regex = /^\/preview\/pr-(?<pr>\d+)\/(?<path>.*)$/;
-
-            const matches = regex.exec(path);
-
-            if (matches == null) {
-                // Normal 404 page
-                normal_404_page.hidden = false;
-                closed_pr_page.hidden = true;
-                return;
-            }
-
-            const path_fragment = matches.groups["path"];
-            const pr_number = matches.groups["pr"];
-
-            closed_pr_link.href = `https://github.com/aeroteameindhoven/website/pull/${pr_number}`;
-
-            if (path_fragment.length === 0 || path_fragment === "404.html") {
-                // Root of deleted pr or 404 page of deleted PR
-                normal_404_page.hidden = true;
-                closed_pr_page.hidden = false;
-            } else {
-                // 404 page of possibly existing pr
-                const response = await fetch(
-                    `/preview/pr-${pr_number}/404.html`
-                );
-
-                const body = await response.text();
-                document.body.innerHTML = body;
-            }
-        });
-    </script>
 </html>
