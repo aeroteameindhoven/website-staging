@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Aero Team Eindhoven Staging</title>
         <script>
-            /** @returns {Promise<["normal" | "closed" | "open", string]>} */
+            /** @returns {Promise<["normal", null] | ["closed", string] | ["open", string]>} */
             async function dynamic404() {
                 const path = document.location.pathname;
 
@@ -16,7 +16,7 @@
 
                 if (matches == null) {
                     // Normal 404 page
-                    return ["normal", ""];
+                    return ["normal", null];
                 }
 
                 const path_fragment = matches.groups["path"];
@@ -40,7 +40,6 @@
                     const body = await response.text();
 
                     return ["open", body];
-                    document.body.innerHTML = body;
                 }
             }
 
@@ -73,7 +72,7 @@
                             break;
                         }
                         case "open": {
-                            document.body.innerHTML = page_data;
+                            document.documentElement.innerHTML = page_data;
 
                             break;
                         }
@@ -81,15 +80,14 @@
                 });
             });
         </script>
-    </head>
-    <body>
         <style>
-            /* Style definition placed in body as to be removed when body is replaced */
             :root {
                 /* Prefer dark theme */
                 color-scheme: dark light;
             }
         </style>
+    </head>
+    <body>
         <div id="normal_404_page" hidden>
             <p>There exists no content here</p>
             <nav>
