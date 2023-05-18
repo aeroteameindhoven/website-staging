@@ -43,9 +43,16 @@
                         `/preview/pr-${pr_number}/404.html`
                     );
 
-                    const body = await response.text();
+                    if (response.ok) {
+                        const body = await response.text();
 
-                    return ["open", body];
+                        return ["open", body];
+                    }
+
+                    return [
+                        "closed",
+                        `https://github.com/aeroteameindhoven/website/pull/${pr_number}`,
+                    ];
                 }
             }
 
