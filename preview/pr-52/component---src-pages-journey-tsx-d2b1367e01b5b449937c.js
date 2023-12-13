@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkaero_team_eindhoven=self.webpackChunkaero_team_eindhoven||[]).push([[130],{4084:function(e,n,t){t.r(n),t.d(n,{Head:function(){return l},default:function(){return c}});var r=t(7294),u=t(59),a=t(1656);function l(){return r.createElement(u.Q,{title:"Our journey"})}function c(){return r.createElement(a.Z,null,r.createElement("div",{className:"journey-page"},r.createElement("h1",null,"Graphic will go here.")))}}}]);
+//# sourceMappingURL=component---src-pages-journey-tsx-d2b1367e01b5b449937c.js.map
